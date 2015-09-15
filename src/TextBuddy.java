@@ -118,23 +118,29 @@ public class TextBuddy {
 	 */
 	public static void runCommandsUntilExit(TextBuddy newTextBuddy, Scanner scannerObject) {
 		String command;
-		// Read and execute commands until command is "exit".
-		command = readNextCommand(scannerObject);
-		while (!command.equalsIgnoreCase("exit")) {
-			if (command.equalsIgnoreCase("display")) {
-				display(newTextBuddy);
-			} else if (command.equalsIgnoreCase("add")) {
-				String stringToAdd = readStringToAdd(scannerObject);
-				add(newTextBuddy, stringToAdd);
-			} else if (command.equalsIgnoreCase("delete")) {
-				int lineNumberToDelete = scannerObject.nextInt();
-				delete(newTextBuddy, lineNumberToDelete);
-			} else if (command.equalsIgnoreCase("clear")) {
-				clear(newTextBuddy);
-			} else {
-				showToUser(MESSAGE_COMMAND_UNRECOGNIZED);
-			}
-			command = readNextCommand(scannerObject);
+		
+		command = readNextCommand(scannerObject).toLowerCase();
+		while (true) {
+			executeCommand(newTextBuddy, command, scannerObject);
+			command = readNextCommand(scannerObject).toLowerCase();
+		}
+	}
+	
+	public static void executeCommand(TextBuddy newTextBuddy, String command, Scanner scannerObject) {
+		if (command.equals("display")) {
+			display(newTextBuddy);
+		} else if (command.equals("add")) {
+			String stringToAdd = readStringToAdd(scannerObject);
+			add(newTextBuddy, stringToAdd);
+		} else if (command.equals("delete")) {
+			int lineNumberToDelete = scannerObject.nextInt();
+			delete(newTextBuddy, lineNumberToDelete);
+		} else if (command.equals("clear")) {
+			clear(newTextBuddy);
+		} else if (command.equals("exit")) {
+			System.exit(0);
+		} else {
+			showToUser(MESSAGE_COMMAND_UNRECOGNIZED);
 		}
 	}
 	
