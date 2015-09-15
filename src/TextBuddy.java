@@ -69,6 +69,8 @@ public class TextBuddy {
 	private static final String LINE_WITH_NUMBERING = "%1$s. %2$s%n";
 	// Position of filename in the Command-Line Argument array.
 	private static final int POSITION_OF_FILENAME = 0;
+	// Space character as a valid delimiter
+	private static final String SPACE = " ";
 	
 	private File _file;
 	
@@ -117,27 +119,29 @@ public class TextBuddy {
 	 * @param scannerObject		Scanner for receiving typed inputs from user.
 	 */
 	public static void runCommandsUntilExit(TextBuddy newTextBuddy, Scanner scannerObject) {
-		String command, feedback;
+		String commandLine, feedback;
 		
 		do {
-			command = readNextCommand(scannerObject).toLowerCase();
-			feedback = executeCommand(newTextBuddy, command, scannerObject);
+			commandLine = readCommandLine(scannerObject);
+			feedback = executeCommand(newTextBuddy, commandLine, scannerObject);
 			if (feedback != null) showToUser(feedback);
 		} while (feedback != null);
 	}
 	
-	public static String executeCommand(TextBuddy newTextBuddy, String command, Scanner scannerObject) {
-		if (command.equals("display")) {
+	public static String executeCommand(TextBuddy newTextBuddy, String commandLine, Scanner scannerObject) {
+		String commandType = getCommandType(commandLine).toLowerCase();
+		
+		if (commandType.equals("display")) {
 			return display(newTextBuddy);
-		} else if (command.equals("add")) {
-			String stringToAdd = readStringToAdd(scannerObject);
+		} else if (commandType.equals("add")) {
+			String stringToAdd = getCommandParameter(commandLine);
 			return add(newTextBuddy, stringToAdd);
-		} else if (command.equals("delete")) {
-			int lineNumberToDelete = scannerObject.nextInt();
+		} else if (commandType.equals("delete")) {
+			int lineNumberToDelete = Integer.parseInt(getCommandParameter(commandLine));
 			return delete(newTextBuddy, lineNumberToDelete);
-		} else if (command.equals("clear")) {
+		} else if (commandType.equals("clear")) {
 			return clear(newTextBuddy);
-		} else if (command.equals("exit")) {
+		} else if (commandType.equals("exit")) {
 			return null;
 		} else {
 			return MESSAGE_COMMAND_UNRECOGNIZED;
@@ -300,20 +304,28 @@ public class TextBuddy {
 		fileToReplace.renameTo(fileToDelete);
 	}
 	
-	public static String readNextCommand(Scanner scannerObject) {
+	public static String readCommandLine(Scanner scannerObject) {
 		String command;
 		
 		showToUser(MESSAGE_ENTER_COMMAND);
-		command = scannerObject.next();
+		command = scannerObject.nextLine();
 		return command;
 	}
 	
-	public static String readStringToAdd(Scanner scannerObject) {
-		String stringToAddWithSpace, stringToAdd;
-		
-		stringToAddWithSpace = scannerObject.nextLine();
-		stringToAdd = stringToAddWithSpace.trim();
-		return stringToAdd;
+	public static String getCommandType(String commandLine){
+		if (commandLine.contains(SPACE)) {
+			return commandLine.substring(0, commandLine.indexOf(SPACE));
+		} else {
+			return commandLine;
+		}
+	}
+	
+	public static String getCommandParameter(String commandLine) {
+		if (commandLine.contains(SPACE)) {
+			return commandLine.substring(commandLine.indexOf(SPACE)+1, commandLine.length());
+		} else {
+			return null;
+		}
 	}
 	
 	/**
