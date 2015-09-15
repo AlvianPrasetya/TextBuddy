@@ -117,30 +117,30 @@ public class TextBuddy {
 	 * @param scannerObject		Scanner for receiving typed inputs from user.
 	 */
 	public static void runCommandsUntilExit(TextBuddy newTextBuddy, Scanner scannerObject) {
-		String command;
+		String command, feedback;
 		
-		command = readNextCommand(scannerObject).toLowerCase();
-		while (true) {
-			executeCommand(newTextBuddy, command, scannerObject);
+		do {
 			command = readNextCommand(scannerObject).toLowerCase();
-		}
+			feedback = executeCommand(newTextBuddy, command, scannerObject);
+			if (feedback != null) showToUser(feedback);
+		} while (feedback != null);
 	}
 	
-	public static void executeCommand(TextBuddy newTextBuddy, String command, Scanner scannerObject) {
+	public static String executeCommand(TextBuddy newTextBuddy, String command, Scanner scannerObject) {
 		if (command.equals("display")) {
-			display(newTextBuddy);
+			return display(newTextBuddy);
 		} else if (command.equals("add")) {
 			String stringToAdd = readStringToAdd(scannerObject);
-			add(newTextBuddy, stringToAdd);
+			return add(newTextBuddy, stringToAdd);
 		} else if (command.equals("delete")) {
 			int lineNumberToDelete = scannerObject.nextInt();
-			delete(newTextBuddy, lineNumberToDelete);
+			return delete(newTextBuddy, lineNumberToDelete);
 		} else if (command.equals("clear")) {
-			clear(newTextBuddy);
+			return clear(newTextBuddy);
 		} else if (command.equals("exit")) {
-			System.exit(0);
+			return null;
 		} else {
-			showToUser(MESSAGE_COMMAND_UNRECOGNIZED);
+			return MESSAGE_COMMAND_UNRECOGNIZED;
 		}
 	}
 	
@@ -149,18 +149,18 @@ public class TextBuddy {
 	 * with each of their corresponding numbering.
 	 * @param newTextBuddy	The TextBuddy object containing the storage file.
 	 */
-	public static void display(TextBuddy newTextBuddy) {
+	public static String display(TextBuddy newTextBuddy) {
 		if (isEmptyFile(newTextBuddy._file)) {
-			showToUser(String.format(MESSAGE_FILE_IS_EMPTY, newTextBuddy._file.getName()));
+			return String.format(MESSAGE_FILE_IS_EMPTY, newTextBuddy._file.getName());
 		} else {
 			// Initialize the required reader objects to read the storage file.
 			try (FileReader fileInputStream = new FileReader(newTextBuddy._file);
 				 BufferedReader reader = new BufferedReader(fileInputStream)) {
 				
-				printLinesInFile(reader);
+				return getFileContent(reader);
 				
 			} catch (IOException exceptionMessage) {
-				showToUser(String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage()));
+				return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
 			}
 		}
 	}
@@ -171,18 +171,18 @@ public class TextBuddy {
 	 * @param newTextBuddy	The TextBuddy object containing the storage file.
 	 * @param lineToAdd		The String to be added to the storage file.
 	 */
-	public static void add(TextBuddy newTextBuddy, String lineToAdd) {
+	public static String add(TextBuddy newTextBuddy, String lineToAdd) {
 		// Initialize the required writer objects to write into storage file.
 		try (FileWriter fileOutputStream = new FileWriter(newTextBuddy._file, true);
 			 BufferedWriter writer = new BufferedWriter(fileOutputStream)) {
 			
 			writer.append(lineToAdd);
 			writer.append("\n");
-			showToUser(String.format(MESSAGE_ADD_LINE_SUCCESS, newTextBuddy._file.getName(), 
-									 lineToAdd));
+			return String.format(MESSAGE_ADD_LINE_SUCCESS, newTextBuddy._file.getName(), 
+								 lineToAdd);
 			
 		} catch (IOException exceptionMessage) {
-			showToUser(String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage()));
+			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
 		}
 	}
 	
@@ -192,7 +192,7 @@ public class TextBuddy {
 	 * @param newTextBuddy			The TextBuddy object containing the storage file.
 	 * @param lineNumberToDelete	The line number of the string to be deleted.
 	 */
-	public static void delete(TextBuddy newTextBuddy, int lineNumberToDelete) {
+	public static String delete(TextBuddy newTextBuddy, int lineNumberToDelete) {
 		File temporaryFile = new File(TEMPORARY_FILE_NAME);
 		// Initialize the required reader objects to read the storage file.
 		// Initialize the required writer objects to write into temporary file.
@@ -202,11 +202,11 @@ public class TextBuddy {
 			 BufferedWriter temporaryWriter = new BufferedWriter(temporaryOutputStream)) {
 			
 			temporaryFile.createNewFile();
-			copyUndeletedLinesToNewFile(newTextBuddy._file.getName(), reader, 
+			return copyUndeletedLinesToNewFile(newTextBuddy._file.getName(), reader, 
 										temporaryWriter, lineNumberToDelete);
 			
 		} catch (IOException exceptionMessage) {
-			showToUser(String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage()));
+			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
 		} finally {
 			deleteAndReplace(newTextBuddy._file, temporaryFile);
 		}
@@ -218,14 +218,14 @@ public class TextBuddy {
 	 * message if exception occurs.
 	 * @param newTextBuddy	The TextBuddy object containing the storage file.
 	 */
-	public static void clear(TextBuddy newTextBuddy) {
+	public static String clear(TextBuddy newTextBuddy) {
 		File temporaryFile = new File(TEMPORARY_FILE_NAME);
 		try {
 			temporaryFile.createNewFile();
 			deleteAndReplace(newTextBuddy._file, temporaryFile);
-			showToUser(String.format(MESSAGE_CLEAR_FILE_SUCCESS, newTextBuddy._file.getName()));
+			return String.format(MESSAGE_CLEAR_FILE_SUCCESS, newTextBuddy._file.getName());
 		} catch (IOException exceptionMessage) {
-			showToUser(String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage()));
+			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
 		}
 	}
 	
@@ -237,7 +237,7 @@ public class TextBuddy {
 	 * @param temporaryWriter		The writer object to write through the temporary file.
 	 * @param lineNumberToDelete	The line number of the string to be deleted.
 	 */
-	public static void copyUndeletedLinesToNewFile(String fileName, BufferedReader reader, 
+	public static String copyUndeletedLinesToNewFile(String fileName, BufferedReader reader, 
 												   BufferedWriter temporaryWriter, int lineNumberToDelete) {
 		try {
 			String currentLine, deletedLine = null;
@@ -256,12 +256,12 @@ public class TextBuddy {
 				currentLine = reader.readLine();
 			}
 			if (lineNumberToDelete > currentLineNumber){
-				showToUser(String.format(MESSAGE_DELETE_LINE_FAILED, fileName, lineNumberToDelete));
+				return String.format(MESSAGE_DELETE_LINE_FAILED, fileName, lineNumberToDelete);
 			} else {
-				showToUser(String.format(MESSAGE_DELETE_LINE_SUCCESS, fileName, deletedLine));
+				return String.format(MESSAGE_DELETE_LINE_SUCCESS, fileName, deletedLine);
 			}
 		} catch (IOException exceptionMessage) {
-			showToUser(String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage()));
+			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
 		}
 	}
 	
@@ -321,19 +321,22 @@ public class TextBuddy {
 	 * preceded by their line numbers.
 	 * @param reader	The reader object to read through the storage file.
 	 */
-	public static void printLinesInFile(BufferedReader reader) {
+	public static String getFileContent(BufferedReader reader) {
 		try {
+			String fileContent = new String("");
 			String currentLine;
 			int numOfLinesRead = 0;
 			
 			currentLine = reader.readLine();
 			while (currentLine != null) {
 				numOfLinesRead++;
-				showToUser(String.format(LINE_WITH_NUMBERING, numOfLinesRead, currentLine));
+				fileContent += String.format(LINE_WITH_NUMBERING, numOfLinesRead, currentLine);
 				currentLine = reader.readLine();
 			}
+			
+			return fileContent;
 		} catch (IOException exceptionMessage) {
-			showToUser(String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage()));
+			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
 		}
 	}
 	
