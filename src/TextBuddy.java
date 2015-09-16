@@ -162,8 +162,8 @@ public class TextBuddy {
 			try (FileReader fileInputStream = new FileReader(_file);
 				 BufferedReader reader = new BufferedReader(fileInputStream)) {
 				
-				ArrayList<String> fileContent = getFileContent(reader);
-				return getCompressedString(fileContent);
+				ArrayList<String> fileContentWithNumberings = addNumberings(getFileContent(reader));
+				return getCompressedString(fileContentWithNumberings);
 				
 			} catch (IOException exceptionMessage) {
 				return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
@@ -339,12 +339,10 @@ public class TextBuddy {
 		try {
 			ArrayList<String> fileContent = new ArrayList<String>();
 			String currentLine;
-			int numOfLinesRead = 0;
 			
 			currentLine = reader.readLine();
 			while (currentLine != null) {
-				numOfLinesRead++;
-				fileContent.add(String.format(LINE_WITH_NUMBERING, numOfLinesRead, currentLine));
+				fileContent.add(currentLine);
 				currentLine = reader.readLine();
 			}
 			
@@ -352,6 +350,18 @@ public class TextBuddy {
 		} catch (IOException exceptionMessage) {
 			showToUser(String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage()));
 			return null;
+		}
+	}
+	
+	public static ArrayList<String> addNumberings(ArrayList<String> fileContent) {
+		if (fileContent == null) {
+			return null;
+		} else {
+			ArrayList<String> fileContentWithNumberings = new ArrayList<String>();
+			for (int i = 0; i < fileContent.size(); i++) {
+				fileContentWithNumberings.add(String.format(LINE_WITH_NUMBERING, i + 1, fileContent.get(i)));
+			}
+			return fileContentWithNumberings;
 		}
 	}
 	
