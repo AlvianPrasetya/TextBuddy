@@ -138,7 +138,7 @@ public class TextBuddy {
 			return newTextBuddy.add(stringToAdd);
 		} else if (commandType.equals("delete")) {
 			int lineNumberToDelete = Integer.parseInt(getCommandParameter(commandLine));
-			return delete(newTextBuddy, lineNumberToDelete);
+			return newTextBuddy.delete(lineNumberToDelete);
 		} else if (commandType.equals("clear")) {
 			return clear(newTextBuddy);
 		} else if (commandType.equals("exit")) {
@@ -196,23 +196,23 @@ public class TextBuddy {
 	 * @param newTextBuddy			The TextBuddy object containing the storage file.
 	 * @param lineNumberToDelete	The line number of the string to be deleted.
 	 */
-	public static String delete(TextBuddy newTextBuddy, int lineNumberToDelete) {
+	public String delete(int lineNumberToDelete) {
 		File temporaryFile = new File(TEMPORARY_FILE_NAME);
 		// Initialize the required reader objects to read the storage file.
 		// Initialize the required writer objects to write into temporary file.
-		try (FileReader fileInputStream = new FileReader(newTextBuddy._file);
+		try (FileReader fileInputStream = new FileReader(_file);
 			 BufferedReader reader = new BufferedReader(fileInputStream);
 			 FileWriter temporaryOutputStream = new FileWriter(temporaryFile);
 			 BufferedWriter temporaryWriter = new BufferedWriter(temporaryOutputStream)) {
 			
 			temporaryFile.createNewFile();
-			return copyUndeletedLinesToNewFile(newTextBuddy._file.getName(), reader, 
+			return copyUndeletedLinesToNewFile(_file.getName(), reader, 
 										temporaryWriter, lineNumberToDelete);
 			
 		} catch (IOException exceptionMessage) {
 			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
 		} finally {
-			deleteAndReplace(newTextBuddy._file, temporaryFile);
+			deleteAndReplace(_file, temporaryFile);
 		}
 	}
 	
