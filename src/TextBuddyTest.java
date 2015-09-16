@@ -60,7 +60,7 @@ public class TextBuddyTest {
 	
 
 	private void testOneCommand(String description, String expected, String command) {
-		assertEquals(description, expected, TextBuddy.executeCommand(new TextBuddy("mytestfile.txt"), command, sc)); 
+		assertEquals(description, expected, new TextBuddy("mytestfile.txt").executeCommand(command, sc)); 
 	}
 
 }

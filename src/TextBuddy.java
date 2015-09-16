@@ -109,7 +109,7 @@ public class TextBuddy {
 			fileName = args[POSITION_OF_FILENAME];
 		}
 		TextBuddy newTextBuddy = new TextBuddy(fileName);
-		runCommandsUntilExit(newTextBuddy, scannerObject);
+		newTextBuddy.runCommandsUntilExit(scannerObject);
 	}
 	
 	/**
@@ -118,29 +118,29 @@ public class TextBuddy {
 	 * @param newTextBuddy		The TextBuddy object containing the storage file.
 	 * @param scannerObject		Scanner for receiving typed inputs from user.
 	 */
-	public static void runCommandsUntilExit(TextBuddy newTextBuddy, Scanner scannerObject) {
+	public void runCommandsUntilExit(Scanner scannerObject) {
 		String commandLine, feedback;
 		
 		do {
 			commandLine = readCommandLine(scannerObject);
-			feedback = executeCommand(newTextBuddy, commandLine, scannerObject);
+			feedback = executeCommand(commandLine, scannerObject);
 			if (feedback != null) showToUser(feedback);
 		} while (feedback != null);
 	}
 	
-	public static String executeCommand(TextBuddy newTextBuddy, String commandLine, Scanner scannerObject) {
+	public String executeCommand(String commandLine, Scanner scannerObject) {
 		String commandType = getCommandType(commandLine).toLowerCase();
 		
 		if (commandType.equals("display")) {
-			return newTextBuddy.display();
+			return display();
 		} else if (commandType.equals("add")) {
 			String stringToAdd = getCommandParameter(commandLine);
-			return newTextBuddy.add(stringToAdd);
+			return add(stringToAdd);
 		} else if (commandType.equals("delete")) {
 			int lineNumberToDelete = Integer.parseInt(getCommandParameter(commandLine));
-			return newTextBuddy.delete(lineNumberToDelete);
+			return delete(lineNumberToDelete);
 		} else if (commandType.equals("clear")) {
-			return newTextBuddy.clear();
+			return clear();
 		} else if (commandType.equals("exit")) {
 			return null;
 		} else {
