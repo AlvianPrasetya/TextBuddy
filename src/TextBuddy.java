@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.Scanner;
 import java.util.ArrayList;
 
@@ -66,12 +65,12 @@ public class TextBuddy {
 	
 	// This defines the temporary file name used to copy from initial storage file.
 	private static final String TEMPORARY_FILE_NAME = "tempFile.txt";
-	// This defines the format for printing line of string with its numbering.
-	private static final String LINE_WITH_NUMBERING = "%1$s. %2$s%n";
+	// This defines the format for line of string with line break.
+	private static final String FORMAT_LINE = "%1$s%n";
+	// This defines the format for line of string with its numbering.
+	private static final String FORMAT_LINE_WITH_NUMBERING = "%1$s. %2$s";
 	// Position of filename in the Command-Line Argument array.
 	private static final int POSITION_OF_FILENAME = 0;
-	// Space character as a valid delimiter
-	private static final String SPACE = " ";
 	
 	private File _file;
 	
@@ -100,7 +99,7 @@ public class TextBuddy {
 	 */
 	public static void main(String[] args) {
 		Scanner scannerObject = new Scanner(System.in);
-		String fileName;
+		String fileName = new String();
 		
 		if (isEmptyArray(args)) {
 			showToUser(MESSAGE_FILE_NAME_EMPTY);
@@ -120,7 +119,8 @@ public class TextBuddy {
 	 * @param scannerObject		Scanner for receiving typed inputs from user.
 	 */
 	public void runCommandsUntilExit(Scanner scannerObject) {
-		String commandLine, feedback;
+		String commandLine = new String();
+		String feedback = new String();
 		
 		do {
 			commandLine = readCommandLine(scannerObject);
@@ -159,18 +159,14 @@ public class TextBuddy {
 			return String.format(MESSAGE_FILE_IS_EMPTY, _file.getName());
 		} else {
 			// Initialize the required reader objects to read the storage file.
-			try (FileReader fileInputStream = new FileReader(_file);
-				 BufferedReader reader = new BufferedReader(fileInputStream)) {
-				
-				ArrayList<String> fileContentWithNumberings = addNumberings(getFileContent(reader));
-				return getCompressedString(fileContentWithNumberings);
-				
+			try (BufferedReader reader = new BufferedReader(new FileReader(_file))) {
+				return getCompressedString(addNumberings(getFileContent(reader)));
 			} catch (IOException exceptionMessage) {
 				return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
 			}
 		}
 	}
-	
+
 	/**
 	 * This method appends the specified String to the last line of the 
 	 * storage file.
@@ -179,14 +175,9 @@ public class TextBuddy {
 	 */
 	public String add(String lineToAdd) {
 		// Initialize the required writer objects to write into storage file.
-		try (FileWriter fileOutputStream = new FileWriter(_file, true);
-			 BufferedWriter writer = new BufferedWriter(fileOutputStream)) {
-			
-			writer.append(lineToAdd);
-			writer.append("\n");
-			return String.format(MESSAGE_ADD_LINE_SUCCESS, _file.getName(), 
-								 lineToAdd);
-			
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(_file, true))) {
+			writer.append(String.format(FORMAT_LINE, lineToAdd));
+			return String.format(MESSAGE_ADD_LINE_SUCCESS, _file.getName(), lineToAdd);
 		} catch (IOException exceptionMessage) {
 			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
 		}
@@ -199,22 +190,25 @@ public class TextBuddy {
 	 * @param lineNumberToDelete	The line number of the string to be deleted.
 	 */
 	public String delete(int lineNumberToDelete) {
-		File temporaryFile = new File(TEMPORARY_FILE_NAME);
 		// Initialize the required reader objects to read the storage file.
-		// Initialize the required writer objects to write into temporary file.
-		try (FileReader fileInputStream = new FileReader(_file);
-			 BufferedReader reader = new BufferedReader(fileInputStream);
-			 FileWriter temporaryOutputStream = new FileWriter(temporaryFile);
-			 BufferedWriter temporaryWriter = new BufferedWriter(temporaryOutputStream)) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(_file))) {
+			ArrayList<String> fileContent = getFileContent(reader);
 			
-			temporaryFile.createNewFile();
-			return copyUndeletedLinesToNewFile(_file.getName(), reader, 
-										temporaryWriter, lineNumberToDelete);
-			
+			if (!isLineNumberValid(lineNumberToDelete, fileContent)) {
+				return String.format(MESSAGE_DELETE_LINE_FAILED, _file.getName(), lineNumberToDelete);
+			} else {
+				clear();
+				// Initialize the required writer objects to write into storage file.
+				BufferedWriter writer = new BufferedWriter(new FileWriter(_file, false));
+				
+				String deletedLine = fileContent.get(lineNumberToDelete - 1);
+				fileContent.remove(lineNumberToDelete - 1);
+				writer.write(getCompressedString(fileContent));
+				writer.close();
+				return String.format(MESSAGE_DELETE_LINE_SUCCESS, _file.getName(), deletedLine);
+			}
 		} catch (IOException exceptionMessage) {
 			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
-		} finally {
-			deleteAndReplace(_file, temporaryFile);
 		}
 	}
 	
@@ -226,46 +220,11 @@ public class TextBuddy {
 	 */
 	public String clear() {
 		File temporaryFile = new File(TEMPORARY_FILE_NAME);
+		
 		try {
 			temporaryFile.createNewFile();
 			deleteAndReplace(_file, temporaryFile);
 			return String.format(MESSAGE_CLEAR_FILE_SUCCESS, _file.getName());
-		} catch (IOException exceptionMessage) {
-			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
-		}
-	}
-	
-	/**
-	 * This method copies the lines with line number other than the one 
-	 * to be deleted to a temporary file.
-	 * @param fileName				The file name of the source file.
-	 * @param reader				The reader object to read through the source file.
-	 * @param temporaryWriter		The writer object to write through the temporary file.
-	 * @param lineNumberToDelete	The line number of the string to be deleted.
-	 */
-	public static String copyUndeletedLinesToNewFile(String fileName, BufferedReader reader, 
-												   BufferedWriter temporaryWriter, int lineNumberToDelete) {
-		try {
-			String currentLine, deletedLine = null;
-			int currentLineNumber = 0;
-			// Read the next line from storage file until null.
-			currentLine = reader.readLine();
-			while (currentLine != null) {
-				currentLineNumber++;
-				// Copy the lines that are not going to be deleted to temporary file.
-				if (currentLineNumber != lineNumberToDelete) {
-					temporaryWriter.append(currentLine);
-					temporaryWriter.append("\n");
-				} else {
-					deletedLine = currentLine;
-				}	
-				currentLine = reader.readLine();
-			}
-			if (lineNumberToDelete > currentLineNumber){
-				return String.format(MESSAGE_DELETE_LINE_FAILED, fileName, lineNumberToDelete);
-			} else {
-				return String.format(MESSAGE_DELETE_LINE_SUCCESS, fileName, deletedLine);
-			}
 		} catch (IOException exceptionMessage) {
 			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
 		}
@@ -279,16 +238,14 @@ public class TextBuddy {
 	 */
 	public static boolean isEmptyFile(File fileToCheck) {
 		// Initialize the required reader objects to read the storage file.
-		try (FileReader fileInputStream = new FileReader(fileToCheck);
-			 BufferedReader reader = new BufferedReader(fileInputStream)) {
-
+		try (BufferedReader reader = new BufferedReader(new FileReader(fileToCheck))) {
 			String firstLine = reader.readLine();
+			
 			if (firstLine == null) {
 				return true;
 			} else {
 				return false;
 			}
-			
 		} catch (IOException exceptionMessage) {
 			showToUser(String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage()));
 			return false;
@@ -307,24 +264,22 @@ public class TextBuddy {
 	}
 	
 	public static String readCommandLine(Scanner scannerObject) {
-		String command;
-		
 		showToUser(MESSAGE_ENTER_COMMAND);
-		command = scannerObject.nextLine();
+		String command = scannerObject.nextLine();
 		return command;
 	}
 	
 	public static String getCommandType(String commandLine){
-		if (commandLine.contains(SPACE)) {
-			return commandLine.substring(0, commandLine.indexOf(SPACE));
+		if (commandLine.contains(" ")) {
+			return commandLine.substring(0, commandLine.indexOf(" "));
 		} else {
 			return commandLine;
 		}
 	}
 	
 	public static String getCommandParameter(String commandLine) {
-		if (commandLine.contains(SPACE)) {
-			return commandLine.substring(commandLine.indexOf(SPACE)+1, commandLine.length());
+		if (commandLine.contains(" ")) {
+			return commandLine.substring(commandLine.indexOf(" ") + 1, commandLine.length());
 		} else {
 			return null;
 		}
@@ -338,14 +293,12 @@ public class TextBuddy {
 	public static ArrayList<String> getFileContent(BufferedReader reader) {
 		try {
 			ArrayList<String> fileContent = new ArrayList<String>();
-			String currentLine;
+			String currentLine = reader.readLine();
 			
-			currentLine = reader.readLine();
 			while (currentLine != null) {
 				fileContent.add(currentLine);
 				currentLine = reader.readLine();
 			}
-			
 			return fileContent;
 		} catch (IOException exceptionMessage) {
 			showToUser(String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage()));
@@ -358,8 +311,9 @@ public class TextBuddy {
 			return null;
 		} else {
 			ArrayList<String> fileContentWithNumberings = new ArrayList<String>();
+			
 			for (int i = 0; i < fileContent.size(); i++) {
-				fileContentWithNumberings.add(String.format(LINE_WITH_NUMBERING, i + 1, fileContent.get(i)));
+				fileContentWithNumberings.add(String.format(FORMAT_LINE_WITH_NUMBERING, i + 1, fileContent.get(i)));
 			}
 			return fileContentWithNumberings;
 		}
@@ -367,13 +321,22 @@ public class TextBuddy {
 	
 	public static String getCompressedString(ArrayList<String> fileContent) {
 		String compressedString = new String("");
+		
 		if (fileContent == null) {
 			return compressedString;
 		} else {
 			for (int i = 0; i < fileContent.size(); i++) {
-				compressedString += fileContent.get(i);
+				compressedString += String.format(FORMAT_LINE, fileContent.get(i));
 			}
 			return compressedString;
+		}
+	}
+	
+	public static boolean isLineNumberValid(int lineNumber, ArrayList<String> fileContent){
+		if (lineNumber > fileContent.size()) {
+			return false;
+		} else {
+			return true;
 		}
 	}
 	
