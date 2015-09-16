@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import java.util.Scanner;
+import java.util.ArrayList;
 
 /**
  * This program stores and retrieves user specified lines into a storage 
@@ -161,7 +162,8 @@ public class TextBuddy {
 			try (FileReader fileInputStream = new FileReader(_file);
 				 BufferedReader reader = new BufferedReader(fileInputStream)) {
 				
-				return getFileContent(reader);
+				ArrayList<String> fileContent = getFileContent(reader);
+				return getCompressedString(fileContent);
 				
 			} catch (IOException exceptionMessage) {
 				return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
@@ -333,22 +335,35 @@ public class TextBuddy {
 	 * preceded by their line numbers.
 	 * @param reader	The reader object to read through the storage file.
 	 */
-	public static String getFileContent(BufferedReader reader) {
+	public static ArrayList<String> getFileContent(BufferedReader reader) {
 		try {
-			String fileContent = new String("");
+			ArrayList<String> fileContent = new ArrayList<String>();
 			String currentLine;
 			int numOfLinesRead = 0;
 			
 			currentLine = reader.readLine();
 			while (currentLine != null) {
 				numOfLinesRead++;
-				fileContent += String.format(LINE_WITH_NUMBERING, numOfLinesRead, currentLine);
+				fileContent.add(String.format(LINE_WITH_NUMBERING, numOfLinesRead, currentLine));
 				currentLine = reader.readLine();
 			}
 			
 			return fileContent;
 		} catch (IOException exceptionMessage) {
-			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
+			showToUser(String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage()));
+			return null;
+		}
+	}
+	
+	public static String getCompressedString(ArrayList<String> fileContent) {
+		String compressedString = new String("");
+		if (fileContent == null) {
+			return compressedString;
+		} else {
+			for (int i = 0; i < fileContent.size(); i++) {
+				compressedString += fileContent.get(i);
+			}
+			return compressedString;
 		}
 	}
 	
