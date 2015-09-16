@@ -135,7 +135,7 @@ public class TextBuddy {
 			return newTextBuddy.display();
 		} else if (commandType.equals("add")) {
 			String stringToAdd = getCommandParameter(commandLine);
-			return add(newTextBuddy, stringToAdd);
+			return newTextBuddy.add(stringToAdd);
 		} else if (commandType.equals("delete")) {
 			int lineNumberToDelete = Integer.parseInt(getCommandParameter(commandLine));
 			return delete(newTextBuddy, lineNumberToDelete);
@@ -175,14 +175,14 @@ public class TextBuddy {
 	 * @param newTextBuddy	The TextBuddy object containing the storage file.
 	 * @param lineToAdd		The String to be added to the storage file.
 	 */
-	public static String add(TextBuddy newTextBuddy, String lineToAdd) {
+	public String add(String lineToAdd) {
 		// Initialize the required writer objects to write into storage file.
-		try (FileWriter fileOutputStream = new FileWriter(newTextBuddy._file, true);
+		try (FileWriter fileOutputStream = new FileWriter(_file, true);
 			 BufferedWriter writer = new BufferedWriter(fileOutputStream)) {
 			
 			writer.append(lineToAdd);
 			writer.append("\n");
-			return String.format(MESSAGE_ADD_LINE_SUCCESS, newTextBuddy._file.getName(), 
+			return String.format(MESSAGE_ADD_LINE_SUCCESS, _file.getName(), 
 								 lineToAdd);
 			
 		} catch (IOException exceptionMessage) {
