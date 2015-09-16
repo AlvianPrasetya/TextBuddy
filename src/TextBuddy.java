@@ -80,14 +80,14 @@ public class TextBuddy {
 	 * message to user.
 	 * @param fileName	Name of the storage file.
 	 */
-	public TextBuddy(String fileName) {
+	public TextBuddy(String storageFileName) {
 		try {
-			_file = new File(fileName);			
+			_file = new File(storageFileName);			
 			// Create new file if the file does not exist.
 			if (!_file.exists()) {
 				_file.createNewFile();
 			}
-			showToUser(String.format(MESSAGE_WELCOME, fileName));
+			showToUser(String.format(MESSAGE_WELCOME, storageFileName));
 		} catch (Exception exceptionMessage) {
 			showToUser(String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage()));
 		}
@@ -99,16 +99,12 @@ public class TextBuddy {
 	 */
 	public static void main(String[] args) {
 		Scanner scannerObject = new Scanner(System.in);
-		String fileName = new String();
-		
-		if (isEmptyArray(args)) {
+		String storageFileName = getStorageFileName(args);
+		if (storageFileName == null) {
 			showToUser(MESSAGE_FILE_NAME_EMPTY);
-			fileName = null;
 			System.exit(0);
-		} else {
-			fileName = args[POSITION_OF_FILENAME];
 		}
-		TextBuddy newTextBuddy = new TextBuddy(fileName);
+		TextBuddy newTextBuddy = new TextBuddy(storageFileName);
 		newTextBuddy.runCommandsUntilExit(scannerObject);
 	}
 	
@@ -332,7 +328,7 @@ public class TextBuddy {
 		}
 	}
 	
-	public static boolean isLineNumberValid(int lineNumber, ArrayList<String> fileContent){
+	public static boolean isLineNumberValid(int lineNumber, ArrayList<String> fileContent) {
 		if (lineNumber > fileContent.size()) {
 			return false;
 		} else {
@@ -340,7 +336,15 @@ public class TextBuddy {
 		}
 	}
 	
-	public static boolean isEmptyArray(String[] arrayToCheck){
+	public static String getStorageFileName(String[] args) {
+		if (isEmptyArray(args)) {
+			return null;
+		} else {
+			return args[POSITION_OF_FILENAME];
+		}
+	}
+	
+	public static boolean isEmptyArray(String[] arrayToCheck) {
 		if (arrayToCheck.length == 0){
 			return true;
 		} else {
@@ -348,7 +352,7 @@ public class TextBuddy {
 		}
 	}
 	
-	public static void showToUser(String stringToShow){
+	public static void showToUser(String stringToShow) {
 		System.out.print(stringToShow);
 	}
 }
