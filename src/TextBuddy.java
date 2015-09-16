@@ -140,7 +140,7 @@ public class TextBuddy {
 			int lineNumberToDelete = Integer.parseInt(getCommandParameter(commandLine));
 			return newTextBuddy.delete(lineNumberToDelete);
 		} else if (commandType.equals("clear")) {
-			return clear(newTextBuddy);
+			return newTextBuddy.clear();
 		} else if (commandType.equals("exit")) {
 			return null;
 		} else {
@@ -222,12 +222,12 @@ public class TextBuddy {
 	 * message if exception occurs.
 	 * @param newTextBuddy	The TextBuddy object containing the storage file.
 	 */
-	public static String clear(TextBuddy newTextBuddy) {
+	public String clear() {
 		File temporaryFile = new File(TEMPORARY_FILE_NAME);
 		try {
 			temporaryFile.createNewFile();
-			deleteAndReplace(newTextBuddy._file, temporaryFile);
-			return String.format(MESSAGE_CLEAR_FILE_SUCCESS, newTextBuddy._file.getName());
+			deleteAndReplace(_file, temporaryFile);
+			return String.format(MESSAGE_CLEAR_FILE_SUCCESS, _file.getName());
 		} catch (IOException exceptionMessage) {
 			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
 		}
