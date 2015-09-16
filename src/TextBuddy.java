@@ -132,7 +132,7 @@ public class TextBuddy {
 		String commandType = getCommandType(commandLine).toLowerCase();
 		
 		if (commandType.equals("display")) {
-			return display(newTextBuddy);
+			return newTextBuddy.display();
 		} else if (commandType.equals("add")) {
 			String stringToAdd = getCommandParameter(commandLine);
 			return add(newTextBuddy, stringToAdd);
@@ -153,12 +153,12 @@ public class TextBuddy {
 	 * with each of their corresponding numbering.
 	 * @param newTextBuddy	The TextBuddy object containing the storage file.
 	 */
-	public static String display(TextBuddy newTextBuddy) {
-		if (isEmptyFile(newTextBuddy._file)) {
-			return String.format(MESSAGE_FILE_IS_EMPTY, newTextBuddy._file.getName());
+	public String display() {
+		if (isEmptyFile(_file)) {
+			return String.format(MESSAGE_FILE_IS_EMPTY, _file.getName());
 		} else {
 			// Initialize the required reader objects to read the storage file.
-			try (FileReader fileInputStream = new FileReader(newTextBuddy._file);
+			try (FileReader fileInputStream = new FileReader(_file);
 				 BufferedReader reader = new BufferedReader(fileInputStream)) {
 				
 				return getFileContent(reader);
