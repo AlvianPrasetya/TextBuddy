@@ -1,6 +1,9 @@
+package com.alvian.test;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
+import com.alvian.main.TextBuddy;
 
 import java.util.*;
 
@@ -36,7 +39,6 @@ public class TextBuddyTest {
 		testOneCommand("display nothing", "mytestfile.txt is empty" + NL, "display");
 		testOneCommand("exit", null, "exit");
 	}
-	
 
 	private void testOneCommand(String description, String expected, String command) {
 		assertEquals(description, expected, new TextBuddy("mytestfile.txt").executeCommand(command, sc)); 
