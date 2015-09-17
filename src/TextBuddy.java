@@ -193,14 +193,16 @@ public class TextBuddy {
 			if (!isLineNumberValid(lineNumberToDelete, fileContent)) {
 				return String.format(MESSAGE_DELETE_LINE_FAILED, _file.getName(), lineNumberToDelete);
 			} else {
+				String deletedLine = fileContent.get(lineNumberToDelete - 1);
+				fileContent.remove(lineNumberToDelete - 1);
 				clear();
 				// Initialize the required writer objects to write into storage file.
 				BufferedWriter writer = new BufferedWriter(new FileWriter(_file, false));
-				
-				String deletedLine = fileContent.get(lineNumberToDelete - 1);
-				fileContent.remove(lineNumberToDelete - 1);
-				writer.write(getCompressedString(fileContent));
-				writer.close();
+				try {
+					writer.write(getCompressedString(fileContent));
+				} finally {
+					writer.close();
+				}
 				return String.format(MESSAGE_DELETE_LINE_SUCCESS, _file.getName(), deletedLine);
 			}
 		} catch (IOException exceptionMessage) {
