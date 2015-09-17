@@ -58,9 +58,8 @@ public class TextBuddy {
 	private static final String MESSAGE_DELETE_LINE_FAILED = "failed to delete from %1$s, "
 														   + "line %2$s cannot be found%n";
 	private static final String MESSAGE_CLEAR_FILE_SUCCESS = "all content deleted from %1$s%n";
-	private static final String MESSAGE_COMMAND_UNRECOGNIZED = "command is not recognized, "
-															 + "please enter a valid command "
-															 + "(add/display/delete/clear)%n";
+	private static final String MESSAGE_COMMAND_UNRECOGNIZED = "command \"%1$s\" is not recognized, "
+															 + "please enter a valid command%n";
 	private static final String MESSAGE_EXCEPTION = "exception encountered: %1$s%n";
 	
 	// This defines the temporary file name used to copy from initial storage file.
@@ -141,7 +140,7 @@ public class TextBuddy {
 		} else if (commandType.equals("exit")) {
 			return null;
 		} else {
-			return MESSAGE_COMMAND_UNRECOGNIZED;
+			return String.format(MESSAGE_COMMAND_UNRECOGNIZED, commandType);
 		}
 	}
 	
