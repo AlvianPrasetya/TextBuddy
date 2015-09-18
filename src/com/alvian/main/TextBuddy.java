@@ -241,7 +241,7 @@ public class TextBuddy {
 			if (fileContent.isEmpty()) {
 				return String.format(MESSAGE_SORT_FILE_FAILED, _file.getName());
 			} else {
-				Collections.sort(fileContent);
+				Collections.sort(fileContent, String.CASE_INSENSITIVE_ORDER);
 				clear();
 				BufferedWriter writer = new BufferedWriter(new FileWriter(_file, false));
 				try {
