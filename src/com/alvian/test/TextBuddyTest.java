@@ -47,6 +47,12 @@ public class TextBuddyTest {
 		testOneCommand("add second item", "added to mytestfile.txt: \"hello once again!\"" + NL, "add hello once again!");
 		testOneCommand("sort two entries", "all lines in file mytestfile.txt have been sorted" + NL, "sort");
 		testOneCommand("display sorted entries", "1. hello once again!" + NL + "2. Hello World!" + NL, "display");
+		testOneCommand("add third item", "added to mytestfile.txt: \"I hope this works.\"" + NL, "add I hope this works.");
+		testOneCommand("add fourth item", "added to mytestfile.txt: \"Yeah, it's working!\"" + NL, "add Yeah, it's working!");
+		testOneCommand("display four items", "1. hello once again!" + NL + "2. Hello World!" + NL + "3. I hope this works." + NL + "4. Yeah, it's working!" + NL, "display");
+		testOneCommand("sort four entries", "all lines in file mytestfile.txt have been sorted" + NL, "sort");
+		testOneCommand("display sorted entries", "1. hello once again!" + NL + "2. Hello World!" + NL + "3. I hope this works." + NL + "4. Yeah, it's working!" + NL, "display");
+		testOneCommand("clear", "all content deleted from mytestfile.txt" + NL, "clear");
 	}
 
 	private void testOneCommand(String description, String expected, String command) {
