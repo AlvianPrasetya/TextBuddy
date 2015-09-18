@@ -62,6 +62,9 @@ public class TextBuddyTest {
 		testOneCommand("add second item", "added to mytestfile.txt: \"hello once again!\"" + NL, "add hello once again!");
 		testOneCommand("add third item", "added to mytestfile.txt: \"I hope this works.\"" + NL, "add I hope this works.");
 		testOneCommand("search for Hel", "2 line(s) were found with token \"Hel\" in file mytestfile.txt" + NL + "1. Hello World!" + NL + "2. hello once again!" + NL, "search Hel");
+		testOneCommand("delete second item", "deleted from mytestfile.txt: \"hello once again!\"" + NL, "delete 2");
+		testOneCommand("search for hel", "1 line(s) were found with token \"hel\" in file mytestfile.txt" + NL + "1. Hello World!" + NL, "search hel");
+		testOneCommand("clear", "all content deleted from mytestfile.txt" + NL, "clear");
 	}
 
 	private void testOneCommand(String description, String expected, String command) {
