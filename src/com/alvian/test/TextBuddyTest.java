@@ -14,7 +14,7 @@ public class TextBuddyTest {
 	public Scanner sc = new Scanner(System.in);
 	
 	@Test
-	public void testExecuteCommand() {
+	public void testOne() {
 		// basic functionalities unit test
 		testOneCommand("display before any add", "mytestfile.txt is empty" + NL, "display");
 		testOneCommand("add first item", "added to mytestfile.txt: \"Hello World!\"" + NL, "add Hello World!");
@@ -38,6 +38,11 @@ public class TextBuddyTest {
 		testOneCommand("clear", "all content deleted from mytestfile.txt" + NL, "clear");
 		testOneCommand("display nothing", "mytestfile.txt is empty" + NL, "display");
 		testOneCommand("exit", null, "exit");
+	}
+	
+	@Test
+	public void testTwo() {
+		testOneCommand("sort empty storage", "failed to sort lines in file mytestfile.txt, file is empty" + NL, "sort");
 	}
 
 	private void testOneCommand(String description, String expected, String command) {
