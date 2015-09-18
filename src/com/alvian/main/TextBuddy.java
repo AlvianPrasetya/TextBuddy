@@ -310,8 +310,8 @@ public class TextBuddy {
 			if (searchResult.isEmpty()) {
 				return String.format(MESSAGE_SEARCH_FAILED, searchToken, _file.getName());
 			} else {
-				return String.format(MESSAGE_SEARCH_SUCCESS, searchResult.size(), searchToken, _file.getName()) 
-						+ getCompressedString(addNumberings(searchResult));
+				return String.format(MESSAGE_SEARCH_SUCCESS, searchResult.size(), searchToken, 
+					   _file.getName()) + getCompressedString(addNumberings(searchResult));
 			}
 		} catch (IOException exceptionMessage) {
 			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
@@ -402,7 +402,8 @@ public class TextBuddy {
 			ArrayList<String> fileContentWithNumberings = new ArrayList<String>();
 			
 			for (int i = 0; i < fileContent.size(); i++) {
-				fileContentWithNumberings.add(String.format(FORMAT_LINE_WITH_NUMBERING, i + 1, fileContent.get(i)));
+				fileContentWithNumberings.add(String.format(FORMAT_LINE_WITH_NUMBERING, i + 1, 
+															fileContent.get(i)));
 			}
 			return fileContentWithNumberings;
 		}
