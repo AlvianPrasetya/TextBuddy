@@ -353,7 +353,7 @@ public class TextBuddy {
 		return command;
 	}
 	
-	public static String getCommandType(String commandLine){
+	public static String getCommandType(String commandLine) {
 		if (commandLine.contains(" ")) {
 			return commandLine.substring(0, commandLine.indexOf(" "));
 		} else {
@@ -447,7 +447,7 @@ public class TextBuddy {
 	}
 	
 	public static boolean isEmptyArray(String[] arrayToCheck) {
-		if (arrayToCheck.length == 0){
+		if (arrayToCheck.length == 0) {
 			return true;
 		} else {
 			return false;
