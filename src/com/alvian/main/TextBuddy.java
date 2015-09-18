@@ -63,6 +63,10 @@ public class TextBuddy {
 	private static final String MESSAGE_SORT_FILE_SUCCESS = "all lines in file %1$s have been sorted%n";
 	private static final String MESSAGE_SORT_FILE_FAILED = "failed to sort lines in file %1$s, "
 														 + "file is empty%n";
+	private static final String MESSAGE_SEARCH_SUCCESS = "%1$s line(s) were found "
+													   + "with token \"%2$s\" in file %3$s%n";
+	private static final String MESSAGE_SEARCH_FAILED = "no line was found "
+			  										  + "with token \"%1$s\" in file %2$s%n";
 	private static final String MESSAGE_COMMAND_UNRECOGNIZED = "command \"%1$s\" is not recognized, "
 															 + "please enter a valid command%n";
 	private static final String MESSAGE_EXCEPTION = "exception encountered: %1$s%n";
@@ -144,6 +148,9 @@ public class TextBuddy {
 			return clear();
 		} else if (commandType.equals("sort")) {
 			return sort();
+		} else if (commandType.equals("search")) {
+			String searchToken = getCommandParameter(commandLine);
+			return search(searchToken);
 		} else if (commandType.equals("exit")) {
 			return null;
 		} else {
@@ -250,6 +257,28 @@ public class TextBuddy {
 					writer.close();
 				}
 				return String.format(MESSAGE_SORT_FILE_SUCCESS, _file.getName());
+			}
+		} catch (IOException exceptionMessage) {
+			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
+		}
+	}
+	
+	public String search(String searchToken) {
+		// Initialize the required reader objects to read the storage file.
+		try (BufferedReader reader = new BufferedReader(new FileReader(_file))) {
+			ArrayList<String> fileContent = getFileContent(reader);
+			ArrayList<String> searchResult = new ArrayList<String>();
+			for (int i = 0; i < fileContent.size(); i++) {
+				String currentLineLowerCase = fileContent.get(i).toLowerCase();
+				if (currentLineLowerCase.contains(searchToken.toLowerCase())) {
+					searchResult.add(fileContent.get(i));
+				}
+			}
+			if (searchResult.isEmpty()) {
+				return String.format(MESSAGE_SEARCH_FAILED, searchToken, _file.getName());
+			} else {
+				return String.format(MESSAGE_SEARCH_SUCCESS, searchResult.size(), searchToken, _file.getName()) 
+						+ getCompressedString(addNumberings(searchResult));
 			}
 		} catch (IOException exceptionMessage) {
 			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
