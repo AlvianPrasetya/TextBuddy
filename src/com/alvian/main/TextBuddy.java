@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * This program stores and retrieves user specified lines into a storage 
@@ -59,6 +60,9 @@ public class TextBuddy {
 	private static final String MESSAGE_DELETE_LINE_FAILED = "failed to delete from %1$s, "
 														   + "line %2$s cannot be found%n";
 	private static final String MESSAGE_CLEAR_FILE_SUCCESS = "all content deleted from %1$s%n";
+	private static final String MESSAGE_SORT_FILE_SUCCESS = "all lines in file %1$s have been sorted%n";
+	private static final String MESSAGE_SORT_FILE_FAILED = "failed to sort lines in file %1$s, "
+														 + "file is empty%n";
 	private static final String MESSAGE_COMMAND_UNRECOGNIZED = "command \"%1$s\" is not recognized, "
 															 + "please enter a valid command%n";
 	private static final String MESSAGE_EXCEPTION = "exception encountered: %1$s%n";
@@ -138,6 +142,8 @@ public class TextBuddy {
 			return delete(lineNumberToDelete);
 		} else if (commandType.equals("clear")) {
 			return clear();
+		} else if (commandType.equals("sort")) {
+			return sort();
 		} else if (commandType.equals("exit")) {
 			return null;
 		} else {
@@ -223,6 +229,28 @@ public class TextBuddy {
 			temporaryFile.createNewFile();
 			deleteAndReplace(_file, temporaryFile);
 			return String.format(MESSAGE_CLEAR_FILE_SUCCESS, _file.getName());
+		} catch (IOException exceptionMessage) {
+			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
+		}
+	}
+	
+	public String sort() {
+		// Initialize the required reader objects to read the storage file.
+		try (BufferedReader reader = new BufferedReader(new FileReader(_file))) {
+			ArrayList<String> fileContent = getFileContent(reader);
+			if (fileContent.isEmpty()) {
+				return String.format(MESSAGE_SORT_FILE_FAILED, _file.getName());
+			} else {
+				Collections.sort(fileContent);
+				clear();
+				BufferedWriter writer = new BufferedWriter(new FileWriter(_file, false));
+				try {
+					writer.write(getCompressedString(fileContent));
+				} finally {
+					writer.close();
+				}
+				return String.format(MESSAGE_SORT_FILE_SUCCESS, _file.getName());
+			}
 		} catch (IOException exceptionMessage) {
 			return String.format(MESSAGE_EXCEPTION, exceptionMessage.getMessage());
 		}
