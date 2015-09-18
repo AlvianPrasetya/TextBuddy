@@ -54,6 +54,11 @@ public class TextBuddyTest {
 		testOneCommand("display sorted entries", "1. hello once again!" + NL + "2. Hello World!" + NL + "3. I hope this works." + NL + "4. Yeah, it's working!" + NL, "display");
 		testOneCommand("clear", "all content deleted from mytestfile.txt" + NL, "clear");
 	}
+	
+	@Test
+	public void TestThree() {
+		testOneCommand("search empty storage", "no line was found with token \"abc\" in file mytestfile.txt" + NL, "search abc");
+	}
 
 	private void testOneCommand(String description, String expected, String command) {
 		assertEquals(description, expected, new TextBuddy("mytestfile.txt").executeCommand(command, sc)); 
