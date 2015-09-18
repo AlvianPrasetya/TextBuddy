@@ -43,6 +43,10 @@ public class TextBuddyTest {
 	@Test
 	public void testTwo() {
 		testOneCommand("sort empty storage", "failed to sort lines in file mytestfile.txt, file is empty" + NL, "sort");
+		testOneCommand("add first item", "added to mytestfile.txt: \"Hello World!\"" + NL, "add Hello World!");
+		testOneCommand("add second item", "added to mytestfile.txt: \"hello once again!\"" + NL, "add hello once again!");
+		testOneCommand("sort two entries", "all lines in file mytestfile.txt have been sorted" + NL, "sort");
+		testOneCommand("display sorted entries", "1. hello once again!" + NL + "2. Hello World!" + NL, "display");
 	}
 
 	private void testOneCommand(String description, String expected, String command) {
