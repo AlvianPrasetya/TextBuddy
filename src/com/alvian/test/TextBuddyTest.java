@@ -58,6 +58,10 @@ public class TextBuddyTest {
 	@Test
 	public void TestThree() {
 		testOneCommand("search empty storage", "no line was found with token \"abc\" in file mytestfile.txt" + NL, "search abc");
+		testOneCommand("add first item", "added to mytestfile.txt: \"Hello World!\"" + NL, "add Hello World!");
+		testOneCommand("add second item", "added to mytestfile.txt: \"hello once again!\"" + NL, "add hello once again!");
+		testOneCommand("add third item", "added to mytestfile.txt: \"I hope this works.\"" + NL, "add I hope this works.");
+		testOneCommand("search for Hel", "2 line(s) were found with token \"Hel\" in file mytestfile.txt" + NL + "1. Hello World!" + NL + "2. hello once again!" + NL, "search Hel");
 	}
 
 	private void testOneCommand(String description, String expected, String command) {
