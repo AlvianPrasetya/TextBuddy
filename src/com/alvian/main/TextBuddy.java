@@ -101,10 +101,6 @@ public class TextBuddy {
 		}
 	}
 	
-	/**
-	 * This is the main body of the program.
-	 * @param args	The Command-Line Argument specified by the user when running the program.
-	 */
 	public static void main(String[] args) {
 		Scanner scannerObject = new Scanner(System.in);
 		String storageFileName = getStorageFileName(args);
@@ -117,9 +113,8 @@ public class TextBuddy {
 	}
 	
 	/**
-	 * This method fetches and runs user commands until the command
-	 * specified is "exit".
-	 * @param newTextBuddy		The TextBuddy object containing the storage file.
+	 * This method fetches, runs user commands, and print the feedbacks until 
+	 * the command specified is "exit".
 	 * @param scannerObject		Scanner for receiving typed inputs from user.
 	 */
 	public void runCommandsUntilExit(Scanner scannerObject) {
@@ -128,12 +123,18 @@ public class TextBuddy {
 		
 		do {
 			commandLine = readCommandLine(scannerObject);
-			feedback = executeCommand(commandLine, scannerObject);
+			feedback = executeCommand(commandLine);
 			if (feedback != null) showToUser(feedback);
 		} while (feedback != null);
 	}
 	
-	public String executeCommand(String commandLine, Scanner scannerObject) {
+	/**
+	 * This method runs the specified command and return the feedback given 
+	 * by the program.
+	 * @param commandLine		The user-specified command, including the parameters.
+	 * @return					The feedback string given after the execution of command.
+	 */
+	public String executeCommand(String commandLine) {
 		String commandType = getCommandType(commandLine).toLowerCase();
 		
 		if (commandType.equals("display")) {
@@ -159,9 +160,10 @@ public class TextBuddy {
 	}
 	
 	/**
-	 * This method displays all the entries in the storage file along
-	 * with each of their corresponding numbering.
-	 * @param newTextBuddy	The TextBuddy object containing the storage file.
+	 * This method returns a string of all the entries in the storage file 
+	 * along with each of their corresponding numbering.
+	 * @return	Returns the lines to be displayed, or exception message if 
+	 * 			exception occurs.
 	 */
 	public String display() {
 		if (isEmptyFile(_file)) {
@@ -178,9 +180,9 @@ public class TextBuddy {
 
 	/**
 	 * This method appends the specified String to the last line of the 
-	 * storage file.
-	 * @param newTextBuddy	The TextBuddy object containing the storage file.
+	 * storage file and return a success/unsuccessful message.
 	 * @param lineToAdd		The String to be added to the storage file.
+	 * @return	Returns the successfully add/unsuccessful message.
 	 */
 	public String add(String lineToAdd) {
 		// Initialize the required writer objects to write into storage file.
@@ -194,9 +196,9 @@ public class TextBuddy {
 	
 	/**
 	 * This method deletes an entry with the specified line number from 
-	 * the storage file.
-	 * @param newTextBuddy			The TextBuddy object containing the storage file.
+	 * the storage file and return a success/unsuccessful message.
 	 * @param lineNumberToDelete	The line number of the string to be deleted.
+	 * @return	Returns the successfully delete/unsuccessful message.
 	 */
 	public String delete(int lineNumberToDelete) {
 		// Initialize the required reader objects to read the storage file.
@@ -204,7 +206,8 @@ public class TextBuddy {
 			ArrayList<String> fileContent = getFileContent(reader);
 			
 			if (!isLineNumberValid(lineNumberToDelete, fileContent)) {
-				return String.format(MESSAGE_DELETE_LINE_FAILED, _file.getName(), lineNumberToDelete);
+				return String.format(MESSAGE_DELETE_LINE_FAILED, _file.getName(), 
+									 lineNumberToDelete);
 			} else {
 				String deletedLine = fileContent.get(lineNumberToDelete - 1);
 				fileContent.remove(lineNumberToDelete - 1);
@@ -225,9 +228,10 @@ public class TextBuddy {
 	
 	/**
 	 * This method clears the entire storage file content then 
-	 * prints a success message if it succeeds or prints exception
+	 * returns a success message if it succeeds or exception
 	 * message if exception occurs.
-	 * @param newTextBuddy	The TextBuddy object containing the storage file.
+	 * @return	Returns the successful message if file has been cleared 
+	 * 			or exception message if exception occurs.
 	 */
 	public String clear() {
 		File temporaryFile = new File(TEMPORARY_FILE_NAME);
@@ -241,14 +245,23 @@ public class TextBuddy {
 		}
 	}
 	
+	/**
+	 * This method sorts the entries in the storage file alphabetically 
+	 * and returns a success message or error message if file is empty.
+	 * @return	Returns the successful message if file has been sorted 
+	 * 			or error message if file is empty.
+	 */
 	public String sort() {
 		// Initialize the required reader objects to read the storage file.
 		try (BufferedReader reader = new BufferedReader(new FileReader(_file))) {
 			ArrayList<String> fileContent = getFileContent(reader);
+			
 			if (fileContent.isEmpty()) {
 				return String.format(MESSAGE_SORT_FILE_FAILED, _file.getName());
 			} else {
+				// Entries are sorted alphabetically ignoring different cases.
 				Collections.sort(fileContent, String.CASE_INSENSITIVE_ORDER);
+				// Clear and rewrite the file with the sorted entries.
 				clear();
 				BufferedWriter writer = new BufferedWriter(new FileWriter(_file, false));
 				try {
@@ -263,11 +276,20 @@ public class TextBuddy {
 		}
 	}
 	
+	/**
+	 * This method search the storage file for entries containing the specified 
+	 * substring. It returns the String of entries containing the substring or 
+	 * returns not found message if no entry matches the substring.
+	 * @param searchToken	The specified substring to search for in the storage.
+	 * @return				Returns the String of entries containing the substring 
+	 * 						or returns not found message if no entry matches.
+	 */
 	public String search(String searchToken) {
 		// Initialize the required reader objects to read the storage file.
 		try (BufferedReader reader = new BufferedReader(new FileReader(_file))) {
 			ArrayList<String> fileContent = getFileContent(reader);
 			ArrayList<String> searchResult = new ArrayList<String>();
+			// Iterate and search through every entry in the file content.
 			for (int i = 0; i < fileContent.size(); i++) {
 				String currentLineLowerCase = fileContent.get(i).toLowerCase();
 				if (currentLineLowerCase.contains(searchToken.toLowerCase())) {
@@ -285,12 +307,6 @@ public class TextBuddy {
 		}
 	}
 	
-	/**
-	 * This method checks if a file is empty.
-	 * If the file is empty, true is returned, returns false otherwise.
-	 * @param file	The File object to be checked.
-	 * @return		Boolean indicating if the file is empty.
-	 */
 	public static boolean isEmptyFile(File fileToCheck) {
 		// Initialize the required reader objects to read the storage file.
 		try (BufferedReader reader = new BufferedReader(new FileReader(fileToCheck))) {
@@ -341,9 +357,10 @@ public class TextBuddy {
 	}
 	
 	/**
-	 * This method prints all the lines in the specified file 
-	 * preceded by their line numbers.
+	 * This method returns all the lines in the specified file 
+	 * encapsulated in an array list.
 	 * @param reader	The reader object to read through the storage file.
+	 * @return			An array list of string containing the entries in the file.
 	 */
 	public static ArrayList<String> getFileContent(BufferedReader reader) {
 		try {
@@ -361,6 +378,12 @@ public class TextBuddy {
 		}
 	}
 	
+	/**
+	 * This method adds numberings to all entries of the array list and 
+	 * return the numbered array list of strings.
+	 * @param fileContent	The array list with no numbering in all entries.
+	 * @return				The array list with numberings in all entries.
+	 */
 	public static ArrayList<String> addNumberings(ArrayList<String> fileContent) {
 		if (fileContent == null) {
 			return null;
@@ -374,6 +397,12 @@ public class TextBuddy {
 		}
 	}
 	
+	/**
+	 * This method compresses the specified array list to a string with each 
+	 * element separated by a line break.
+	 * @param fileContent	The array list of string to be compressed.
+	 * @return				The string containing the compressed array list.
+	 */
 	public static String getCompressedString(ArrayList<String> fileContent) {
 		String compressedString = new String("");
 		

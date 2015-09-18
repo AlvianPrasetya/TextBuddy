@@ -5,17 +5,14 @@ import org.junit.Test;
 
 import com.alvian.main.TextBuddy;
 
-import java.util.*;
-
 public class TextBuddyTest {
 
+	// New line / line break constant
 	public static final String NL = System.getProperty("line.separator");
-	
-	public Scanner sc = new Scanner(System.in);
 	
 	@Test
 	public void testOne() {
-		// basic functionalities unit test
+		// Basic functionalities unit test
 		testOneCommand("display before any add", "mytestfile.txt is empty" + NL, "display");
 		testOneCommand("add first item", "added to mytestfile.txt: \"Hello World!\"" + NL, "add Hello World!");
 		testOneCommand("add second item", "added to mytestfile.txt: \"Hello once again!\"" + NL, "add Hello once again!");
@@ -68,7 +65,7 @@ public class TextBuddyTest {
 	}
 
 	private void testOneCommand(String description, String expected, String command) {
-		assertEquals(description, expected, new TextBuddy("mytestfile.txt").executeCommand(command, sc)); 
+		assertEquals(description, expected, new TextBuddy("mytestfile.txt").executeCommand(command)); 
 	}
 
 }
