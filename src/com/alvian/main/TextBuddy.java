@@ -12,15 +12,18 @@ import java.util.Collections;
 /**
  * This program stores and retrieves user specified lines into a storage 
  * file. It takes in user commands and prints the resulting output.
- * Valid commands include "add", "delete", "display", "clear", and "exit".
+ * Valid commands include "add", "delete", "display", "clear", "sort", 
+ * "search", and "exit".
  * Add function adds the specified line to the end of the storage file.
  * Delete function delete the specified line number from the storage file.
  * Display function shows the user all of the lines stored in the storage file.
  * Clear function deletes all entries in the storage file.
+ * Sort function sorts the entries in the storage file alphabetically.
+ * Search function search the entries in the storage file containing a substring.
  * Exit function terminates the program.
  * The program assumes that the user does not require to manually save as it 
  * will be done on every operation and exceptions are simply handled by showing 
- * the exception messages and terminating the program.
+ * the exception messages.
  * The command format is given by the example interaction below:
  
  Welcome to TextBuddy. mytextfile.txt is ready for use
@@ -33,10 +36,18 @@ import java.util.Collections;
  command: display
  1. little brown fox
  2. jumped over the moon
- command: delete 2
- deleted from mytextfile.txt: “jumped over the moon”
+ command: search over
+ 1 line(s) were found with token "over" in file mytextfile.txt
+ 1. jumped over the moon
+ command: sort
+ all lines in file mytextfile.txt have been sorted
  command: display
- 1. little brown fox
+ 1. jumped over the moon
+ 2. little brown fox
+ command: delete 2
+ deleted from mytextfile.txt: “little brown fox”
+ command: display
+ 1. jumped over the moon
  command: clear
  all content deleted from mytextfile.txt
  command: display
